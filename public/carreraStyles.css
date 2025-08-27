@@ -1,0 +1,57 @@
+
+html{
+    scroll-behavior: smooth !important;
+}
+
+
+.bannerInicio{
+    background-image: url('bg-banner.png');
+}
+
+.bannerDistancia{
+    background-image: url('bk-big.png');
+}
+
+.bannerPrecio{
+    background-image: url('bk-small.png');
+}
+
+.logo-margarita{
+    max-width: 450px;
+}
+
+.font-azul{
+    color: #0B3D91;
+}
+
+.font-amarillo{
+    color: #F5D72C;
+}
+
+.bg-azul{
+    background-color: #0B3D91;
+}
+
+.bg-amarillo{
+    background-color: #F5D72C;
+}
+
+.logo-sm-header{
+    max-width: 166px;
+}
+
+.btn-comprar-header{
+    max-width: 100px;
+}
+
+.logo-distancia-carrera{
+    max-width: 340px;
+}
+
+.logo-carrera{
+    width: 400px;
+}
+
+.ticket-ejempolo{
+    max-width: 600px;
+}

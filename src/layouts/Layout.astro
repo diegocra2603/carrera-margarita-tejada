@@ -1,17 +1,46 @@
 ---
 import '../styles/global.css';
+
+export interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="es">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		
+		<!-- Meta tags para SEO -->
+		<meta property="og:description" content="11a Carrera San Martín, Los atletas que inspiran a todo un país.">
+		<meta property="og:image" content="/meta_image.png">
+		<meta property="og:url" content={Astro.url}>
+		
+		<title>{title} | San Martin</title>
+
+		<!-- Fonts -->
+		<link rel="preconnect" href="https://fonts.bunny.net">
+		<link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+		<!-- Google tag (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-8HF33WSJXL"></script>
 	</head>
 	<body>
 		<slot />
+
+		<script is:inline>
+			// Google Analytics
+			window.dataLayer = window.dataLayer || [];
+			function gtag() {
+				dataLayer.push(arguments);
+			}
+			gtag('js', new Date());
+			gtag('config', 'G-8HF33WSJXL');
+		</script>
 	</body>
 </html>

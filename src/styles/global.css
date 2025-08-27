@@ -1,3 +1,6 @@
+/* Importar estilos personalizados de la carrera */
+@import './carrera.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

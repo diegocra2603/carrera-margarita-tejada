@@ -1,40 +1,271 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import MenuHeader from '../components/MenuHeader';
+import BannerInicio from '../components/BannerInicio';
+import DistanciaCompra from '../components/DistanciaCompra';
+import FooterMenu from '../components/FooterMenu';
+import NavigationMenu from '../components/NavigationMenu';
+import ScrollAnimation from '../components/ScrollAnimation';
 import ReactCounter from '../components/ReactCounter';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
-<Layout>
-	<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-		<div class="max-w-4xl mx-auto">
-			<h1 class="text-4xl font-bold text-center text-gray-800 mb-8">
-				Mi Proyecto Astro con React y Tailwind
-			</h1>
-			
-			<div class="grid md:grid-cols-2 gap-8">
-				<div class="bg-white rounded-lg shadow-lg p-6">
-					<h2 class="text-2xl font-semibold text-gray-700 mb-4">
-						Componente Astro
-					</h2>
-					<Welcome />
-				</div>
-				
-				<div class="bg-white rounded-lg shadow-lg p-6">
-					<h2 class="text-2xl font-semibold text-gray-700 mb-4">
-						Componente React
-					</h2>
-					<ReactCounter client:load />
-				</div>
-			</div>
-			
-			<div class="mt-8 text-center">
-				<p class="text-gray-600">
-					¡Perfecto! Ahora tienes Astro configurado con React y Tailwind CSS.
-				</p>
-			</div>
+<Layout title="Inicio - Carrera San Martín">
+	<MenuHeader client:load />
+
+	<NavigationMenu client:load />
+
+	<BannerInicio client:load />
+
+	<div class="bg-[#F5D72C] pt-5 pb-5">
+		<div class="text-center text-2xl">
+			<a href="/#PuntoReunion">
+				Domingo <span class="font-azul font-extrabold">6 de Octubre</span>
+			</a>
 		</div>
 	</div>
+
+	<div class="container mx-auto sm:px-10 px-5 overflow-hidden">
+		<ScrollAnimation client:load animation="fade-up" delay={0.1}>
+			<div class="pt-20 pb-10">
+				<div class="text-2xl font-bold font-azul">
+					¡Sold out y listos para la carrera! 🏃
+				</div>
+				<div class="text-xl pb-5">
+					<br />
+					¡Gracias por sumarse! <br />
+					Nos vemos el 6 de octubre apoyando a @FundacionMargaritaTejada. <br /> 
+					¡#AtletasQueInspiran estamos listos para darlo todo!
+				</div>
+			</div>
+		</ScrollAnimation>
+
+		<!--
+		<div class="pt-10">
+			<div class="text-2xl font-bold font-azul">
+				Comprar
+			</div>
+			<div class="text-xl">
+				Quieres comprar tu Ticket digital presiona comprar ahora
+			</div>
+		</div>
+		<div class="grid sm:grid-cols-4 grid-cols-2 sm:gap-5 gap-3 pt-10 pb-10">
+			<div id="Comprar" class="bannerPrecio bg-cover bg-center" data-aos="flip-left" data-aos-duration="1000">
+				<a>
+					<div class="relative sm:h-full sm:w-full h-[120px]">
+						<div class="absolute w-full h-[84%] flex justify-center items-center">
+							<div>
+								<div class="font-amarillo sm:text-md text-xs">Valor</div>
+								<div class="sm:text-3xl text-2xl font-bold text-white">
+									Q125
+								</div>
+							</div>
+						</div>
+						<div class="bg-[#F5D72C] absolute z-10 bottom-0 w-full text-center font-bold font-azul pt-1 pb-1 sm:text-xl text-xs">
+							Comprar ahora
+						</div>
+					</div>
+				</a>
+			</div>
+
+			<div class="bannerDistancia bg-cover bg-center sm:col-span-3">
+				<div class="flex pt-10 pb-10">
+					<div class="sm:w-[340px] w-[100px] mx-auto" data-aos="zoom-in" data-aos-duration="500">
+						<img class="w-full" src="/distancia-trans.png" alt="Distancia">
+					</div>
+				</div>
+			</div>
+		</div>
+		-->
+
+		<hr class="border-1 border-yellow-400">
+
+		<ScrollAnimation client:load animation="fade-up" delay={0.2}>
+			<div class="pt-20 pb-10">
+				<div class="text-2xl font-bold font-azul">
+					¡Tiempo finalizado!
+				</div>
+				<div class="text-xl pb-5">
+					Si no pudiste registrarte en nuestro sitio, lleva tu ticket y el día del evento puedes hacerlo.
+				</div>
+				<!--
+				<div id="btnRegistro" class="bannerDistancia bg-cover bg-center sm:col-span-3">
+					<div class="flex pt-10 pb-10">
+						<div class="mx-auto text-center" data-aos="zoom-in" data-aos-duration="500">
+							<a href="/registro-ticket" class="bg-yellow-400 border-2 border-yellow-400 text-black font-bold py-4 px-8 rounded-lg text-xl hover:bg-transparent hover:text-white hover:border hover:border-2 hover:border-yellow-400 transition duration-300 ease-in-out">
+								REGISTRA TU TICKET
+							</a>
+						</div>
+					</div>
+				</div>
+				-->
+			</div>
+		</ScrollAnimation>
+
+		<hr class="border-1 border-yellow-400">
+
+		<!-- Seccion Beneficio -->
+		<div id="BeneficioDe" class="sm:pt-10 pt-5">
+			<div class="relative overflow-hidden">
+				<div class="absolute w-full h-full flex items-center justify-center">
+					<ScrollAnimation client:load animation="zoom-in" delay={0.3}>
+						<div class="sm:w-[450px] w-[200px]">
+							<a href="https://www.fundacionmargaritatejada.org/" target="_blank" rel="noopener noreferrer">
+								<img class="w-full" src="/margarita-tejada.svg" alt="Fundación Margarita Tejada">
+							</a>
+						</div>
+					</ScrollAnimation>
+				</div>
+				<div>
+					<img class="object-cover w-full" src="/bk-margarita.png" alt="Fondo Margarita">
+				</div>
+			</div>
+		</div>
+
+		<div class="sm:pt-20 pt-10 pb-10 max-w-[1080px] mx-auto">
+			<div>
+				<div class="sm:text-2xl text-xl text-sm font-bold font-azul sm:pb-10 pb-5">
+					¿Que incluye el kit?
+				</div>
+				<div class="grid sm:grid-cols-2">
+					<div>
+						<ScrollAnimation client:load animation="fade-right" delay={0.4}>
+							<div class="sm:text-2xl text-lg flex items-center h-full justify-start">
+								<ul class="list-disc pl-5 pb-5">
+									<li>Mochila de corredor</li>
+									<li>Tshirt de corredor</li>
+									<li>Número y chip del corredor</li>
+								</ul>
+							</div>
+						</ScrollAnimation>
+					</div>
+					<div class="flex items-center justify-start">
+						<ScrollAnimation client:load animation="fade-left" delay={0.5}>
+							<div class="">
+								<img class="object-cover h-96 w-96 rounded-xl" src="/inicio/kit-photo.png" alt="Kit del corredor">
+							</div>
+						</ScrollAnimation>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="pt-10 pb-10 max-w-[1080px] mx-auto">
+			<div class="sm:text-2xl text-xl text-sm font-bold font-azul sm:pb-10 pb-5">
+				Expo dónde te entregaran tu kit
+			</div>
+			<div class="grid sm:grid-cols-2">
+				<div class="flex items-center justify-start">
+					<ScrollAnimation client:load animation="fade-left" delay={0.6}>
+						<div class="">
+							<img class="object-cover h-96 w-96 rounded-xl" src="/inicio/expo-photo.png" alt="Expo">
+						</div>
+					</ScrollAnimation>
+				</div>
+				<div>
+					<ScrollAnimation client:load animation="fade-right" delay={0.7}>
+						<div class="sm:text-2xl text-lg pt-10 flex items-center h-full justify-start">
+							Sábado 5 de Octubre <br />
+							Horario: 8am - 7:00pm <br />
+							Sótano Oakland Place E2
+						</div>
+					</ScrollAnimation>
+				</div>
+			</div>
+		</div>
+
+		<!-- Seccion Punto de Reunion -->
+		<div id="PuntoReunion" class="pt-10 pb-20 max-w-[1080px] mx-auto">
+			<div class="sm:text-2xl text-xl font-bold font-azul">
+				Recorrido de la carrera
+			</div>
+			<div class="sm:pb-10 pb-5 pt-2 text-xl">
+				<span class="font-bold">Av. Reforma 12 Calle zona 9 </span><br />
+				Calentamiento 7:00am <span class="text-yellow-400 font-bold">|</span> Caminathon 7:30am <span class="text-yellow-400 font-bold">|</span> Carrera 8:00am
+			</div>
+			<ScrollAnimation client:load animation="fade-up" delay={0.8}>
+				<div class="mx-auto mapa-carrera">
+					<img class="w-full" src="/mapa-carrera.svg" alt="Mapa de la carrera">
+				</div>
+			</ScrollAnimation>
+		</div>
+
+		<!-- Seccion Canales de Venta -->
+		<div id="CanalesDeVenta">
+			<div>
+				<div class="sm:text-2xl text-xl font-bold font-azul sm:pb-10 pb-5">
+					También adquiérelas en:
+				</div>
+
+				<div class="grid grid-cols-3 sm:gap-5 gap-2 pb-10">
+					<ScrollAnimation client:load animation="flip-left" delay={0.1}>
+						<div>
+							<img class="w-full" src="/btn-sanmartin.svg" alt="San Martín">
+						</div>
+					</ScrollAnimation>
+					<ScrollAnimation client:load animation="flip-left" delay={0.2}>
+						<div>
+							<img class="w-full" src="/btn-bancoindustrial.svg" alt="Banco Industrial">
+						</div>
+					</ScrollAnimation>
+					<ScrollAnimation client:load animation="flip-left" delay={0.3}>
+						<div>
+							<img class="w-full" src="/btn-sports.svg" alt="Sports">
+						</div>
+					</ScrollAnimation>
+				</div>
+			</div>
+		</div>
+
+		<!-- Footer -->
+		<FooterMenu client:load />
+	</div>
+
+	<!-- Script para el contador -->
+	<script>
+		// Configurar la fecha objetivo (hoy a las 22:00)
+		const now = new Date();
+		const targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 0, 0);
+
+		const btnRegistro = document.getElementById('btnRegistro');
+		const ocultar = document.getElementsByClassName('ocultar');
+
+		// Si ya pasaron las 22:00, establecer la fecha objetivo para mañana
+		if (now > targetDate) {
+			targetDate.setDate(targetDate.getDate() + 1);
+		}
+
+		function updateCountdown() {
+			const currentTime = new Date();
+			const diff = targetDate.getTime() - currentTime.getTime();
+
+			const hours = Math.floor(diff / 1000 / 60 / 60);
+			const minutes = Math.floor(diff / 1000 / 60) % 60;
+			const seconds = Math.floor(diff / 1000) % 60;
+
+			const countdownElement = document.getElementById('countdown');
+			if (countdownElement) {
+				countdownElement.innerHTML = 
+					`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+			}
+			
+			if (diff < 0) {
+				clearInterval(timerInterval);
+				if (countdownElement) {
+					countdownElement.innerHTML = "¡Tiempo finalizado!";
+				}
+				if (btnRegistro) {
+					(btnRegistro as HTMLElement).style.display = 'none';
+				}
+				if (ocultar && ocultar.length > 0) {
+					(ocultar[0] as HTMLElement).style.display = 'none';
+				}
+			}
+		}
+
+		// Actualizar el contador cada segundo
+		const timerInterval = setInterval(updateCountdown, 1000);
+
+		// Llamar a la función una vez para evitar el retraso inicial
+		updateCountdown();
+	</script>
 </Layout>

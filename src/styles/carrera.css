@@ -1,0 +1,50 @@
+/* Estilos personalizados para la carrera */
+
+/* Fuentes personalizadas */
+.font-azul {
+  color: #003B7A;
+}
+
+.font-amarillo {
+  color: #F5D72C;
+}
+
+/* Banners de fondo */
+.bannerInicio {
+  background-image: url('/bg-banner.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.bannerPrecio {
+  background-image: url('/bk-big.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.bannerDistancia {
+  background-image: url('/bk-small.png');
+  background-size: cover;
+  background-position: center;
+}
+
+/* Mapa de la carrera */
+.mapa-carrera {
+  max-width: 800px;
+}
+
+/* Estilos para el banner de niños */
+.ninos {
+  /* Sin efectos adicionales para mantener transparencia */
+}
+
+/* Responsive para móviles */
+@media (max-width: 640px) {
+  .logo-carrera {
+    max-width: 200px;
+  }
+  
+  .ninos {
+    max-width: 300px;
+  }
+}
