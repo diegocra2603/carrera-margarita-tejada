@@ -208,14 +208,17 @@ export default function FormularioPago() {
                 <Typography variant="h5" fontWeight="bold" color="primary">
                   Detalle de compra
                 </Typography>
-                <Button 
-                  variant="outlined" 
-                  size="small" 
-                  onClick={() => window.location.href = '/compra'}
-                  sx={{ fontSize: '0.75rem' }}
-                >
-                  ← Regresar
-                </Button>
+                                 <Button 
+                   variant="outlined" 
+                   size="small" 
+                   onClick={() => {
+                     sessionStorage.setItem('returningFromPayment', 'true');
+                     window.location.href = '/compra';
+                   }}
+                   sx={{ fontSize: '0.75rem' }}
+                 >
+                   ← Regresar
+                 </Button>
               </Box>
 
               <Box sx={{ border: '2px solid #e0e0e0', borderRadius: 2, p: 3, mb: 3 }}>
@@ -371,6 +374,11 @@ export default function FormularioPago() {
                        fullWidth
                        variant="outlined"
                        size="medium"
+                       onChange={(e) => {
+                         // Convertir a mayúsculas automáticamente
+                         const upperCaseValue = e.target.value.toUpperCase();
+                         field.onChange(upperCaseValue);
+                       }}
                      />
                    )}
                  />

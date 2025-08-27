@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import FormularioCompra from '../components/FormularioCompra';
 import MenuHeader from '../components/MenuHeader';
 import NavigationMenu from '../components/NavigationMenu';
+import FooterMenu from '../components/FooterMenu';
 ---
 
 <Layout title="Comprar Ticket - Carrera Margarita Tejada">
@@ -22,14 +23,13 @@ import NavigationMenu from '../components/NavigationMenu';
     
     <hr class="border-1 border-yellow-400 my-8">
     
-    <div class="sm:pt-10">
-      <div class="pb-24 pt-5">
-        <div class="divide-gray-900/10 bg-gray-50 mb-20 pt-20 pb-20 pl-5 pr-5">
-          <div class="grid grid-cols-1 gap-x-8 gap-y-8 pt-10 md:grid-cols-3">
+    <div class="pb-10">
+        <div class="divide-gray-900/10 bg-gray-50 px-5">
+          <div class="grid grid-cols-1 gap-x-8 gap-y-8 p-5 md:grid-cols-3">
             <div class="px-4 sm:px-0">
               <h2 class="text-base font-semibold leading-7 text-gray-900">Datos de compra</h2>
               <p class="mt-1 text-sm leading-6 text-gray-600">
-                Los siguientes datos son necesarios para poder inscribirte en la carrera
+                Los siguientes datos son necesarios para poder inscribirte en la carrera.
               </p>
             </div>
             
@@ -38,60 +38,9 @@ import NavigationMenu from '../components/NavigationMenu';
             </div>
           </div>
         </div>
-      </div>
-    </div>
-    
-    <!-- Sección de canales de venta -->
-    <div>
-      <div>
-        <div class="sm:text-2xl text-sm font-bold font-azul sm:pb-10 pb-5">
-          También Adquiérelas en:
-        </div>
-        
-        <div class="grid grid-cols-3 sm:gap-5 gap-2 pb-10">
-          <div data-aos="flip-left" data-aos-delay="50" data-aos-duration="1000">
-            <img class="w-full" src="/btn-sanmartin.svg" alt="San Martín">
-          </div>
-          <div data-aos="flip-left" data-aos-delay="100" data-aos-duration="1000">
-            <img class="w-full" src="/btn-bancoindustrial.svg" alt="Banco Industrial">
-          </div>
-          <div data-aos="flip-left" data-aos-delay="150" data-aos-duration="1000">
-            <img class="w-full" src="/btn-sports.svg" alt="Sports">
-          </div>
-        </div>
-      </div>
     </div>
     
     <!-- Footer -->
-    <div class="border-t-2 pt-5 border-gray-200">
-      <div class="flex gap-2">
-        <div>
-          <a href="https://www.facebook.com/sanmartingt" target="_blank">
-            <img src="/btn-facebook.svg" alt="Facebook">
-          </a>
-        </div>
-        <div>
-          <a href="https://www.instagram.com/sanmartingt/" target="_blank">
-            <img src="/btn-instagram.svg" alt="Instagram">
-          </a>
-        </div>
-      </div>
-      <div class="pt-5 pb-3 text-sm">
-        <div class="sm:flex hidden gap-4 text-sm text-gray-500">
-          <div>
-            <a href="/#PuntoReunion">Punto de reunión</a>
-          </div>
-          <div>
-            <a href="/#BeneficioDe">A beneficio de</a>
-          </div>
-          <div>
-            <a href="/#CanalesDeVenta">Canales de venta</a>
-          </div>
-        </div>
-      </div>
-      <div class="pb-20 text-xs text-gray-400">
-        2024 San Martín Bakery. todos los derechos reservados.
-      </div>
-    </div>
+    <FooterMenu client:load />
   </div>
 </Layout>
