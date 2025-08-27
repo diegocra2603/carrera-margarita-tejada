@@ -1,0 +1,74 @@
+---
+import Layout from '../layouts/Layout.astro';
+import FormularioPago from '../components/FormularioPago';
+import MenuHeader from '../components/MenuHeader';
+import NavigationMenu from '../components/NavigationMenu';
+---
+
+<Layout title="Pagar - Carrera Margarita Tejada">
+  <MenuHeader client:load />
+  <NavigationMenu client:load />
+  
+  <div class="container mx-auto sm:px-10 px-5">
+    <hr class="border-1 border-yellow-400">
+    
+    <div class="bg-gray-50 mt-20 mb-20">
+      <div class="mx-auto max-w-2xl px-4 pb-24 pt-16 sm:px-6 lg:max-w-7xl lg:px-8">
+        <FormularioPago client:load />
+      </div>
+    </div>
+    
+    <!-- Canales de venta -->
+    <div>
+      <div>
+        <div class="sm:text-2xl text-sm font-bold font-azul sm:pb-10 pb-5">
+          Tambien Adquierelas en:
+        </div>
+
+        <div class="grid grid-cols-3 sm:gap-5 gap-2 pb-10">
+          <div data-aos="flip-left" data-aos-delay="50" data-aos-duration="1000">
+            <img class="w-full" src="/btn-sanmartin.svg" alt="San Martín">
+          </div>
+          <div data-aos="flip-left" data-aos-delay="100" data-aos-duration="1000">
+            <img class="w-full" src="/btn-bancoindustrial.svg" alt="Banco Industrial">
+          </div>
+          <div data-aos="flip-left" data-aos-delay="150" data-aos-duration="1000">
+            <img class="w-full" src="/btn-sports.svg" alt="Sports">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="border-t-2 pt-5 border-gray-200">
+      <div class="flex gap-2">
+        <div>
+          <a href="https://www.facebook.com/sanmartingt" target="_blank">
+            <img src="/btn-facebook.svg" alt="Facebook">
+          </a>
+        </div>
+        <div>
+          <a href="https://www.instagram.com/sanmartingt/" target="_blank">
+            <img src="/btn-instagram.svg" alt="Instagram">
+          </a>
+        </div>
+      </div>
+      <div class="pt-5 pb-3 text-sm">
+        <div class="sm:flex hidden gap-4 text-sm text-gray-500">
+          <div>
+            <a href="/#PuntoReunion">Punto de reunión</a>
+          </div>
+          <div>
+            <a href="/#BeneficioDe">A beneficio de</a>
+          </div>
+          <div>
+            <a href="/#CanalesDeVenta">Canales de venta</a>
+          </div>
+        </div>
+      </div>
+      <div class="pb-20 text-xs text-gray-400">
+        2024 San Martín Bakery. todos los derechos reservados.
+      </div>
+    </div>
+  </div>
+</Layout>

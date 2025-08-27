@@ -83,14 +83,18 @@ export default function FormularioCompra() {
   const onSubmit = async (data: CompraFormData) => {
     setIsSubmitting(true);
     try {
-      // Aquí puedes enviar los datos a tu API
-      console.log('Datos del formulario:', data);
+      // Guardar datos en sessionStorage
+      const purchaseData = {
+        ...data,
+        fechaNacimiento: data.fechaNacimiento ? data.fechaNacimiento.format('DD/MM/YYYY') : '',
+        total: parseInt(data.cantidad) * 125, // Q125 por ticket
+        timestamp: new Date().toISOString()
+      };
       
-      // Simular envío a API
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      sessionStorage.setItem('purchaseData', JSON.stringify(purchaseData));
       
-      // Mostrar mensaje de éxito o redirigir
-      alert('¡Compra registrada exitosamente!');
+      // Redirigir a la página de pago
+      window.location.href = '/pagar';
       
     } catch (error) {
       console.error('Error al procesar la compra:', error);
