@@ -38,9 +38,12 @@ const pagoSchema = z.object({
     .min(10, 'La dirección debe tener al menos 10 caracteres')
     .max(200, 'La dirección no puede exceder 200 caracteres'),
   numeroTarjeta: z.string()
-    .min(13, 'El número de tarjeta debe tener al menos 13 dígitos')
-    .max(19, 'El número de tarjeta debe tener máximo 19 dígitos')
-    .regex(/^\d+$/, 'Solo se permiten números'),
+    .min(1, 'El número de tarjeta es requerido')
+    .refine((value) => {
+      // Remover espacios para validar solo dígitos
+      const digits = value.replace(/\s/g, '');
+      return digits.length >= 13 && digits.length <= 16 && /^\d+$/.test(digits);
+    }, 'El número de tarjeta debe tener entre 13 y 16 dígitos'),
   nombreTarjeta: z.string()
     .min(3, 'El nombre debe tener al menos 3 caracteres')
     .max(50, 'El nombre no puede exceder 50 caracteres'),
@@ -144,8 +147,15 @@ export default function FormularioPago() {
   const onSubmit = async (data: PagoFormData) => {
     setIsSubmitting(true);
     try {
+      // Limpiar datos formateados para envío
+      const cleanData = {
+        ...data,
+        numeroTarjeta: data.numeroTarjeta.replace(/\s/g, ''), // Remover espacios
+        fechaExpiracion: data.fechaExpiracion.replace('/', '') // Remover /
+      };
+      
       // Aquí puedes enviar los datos de pago a tu API
-      console.log('Datos de pago:', data);
+      console.log('Datos de pago (limpios):', cleanData);
       console.log('Datos de compra:', purchaseData);
       
       // Simular envío a API
@@ -281,158 +291,178 @@ export default function FormularioPago() {
                 Información de pago
               </Typography>
 
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                {/* Teléfono */}
-                <Controller
-                  name="telefono"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Teléfono"
-                      type="tel"
-                      placeholder="12345678"
-                      error={!!errors.telefono}
-                      helperText={errors.telefono?.message}
-                      fullWidth
-                      variant="outlined"
-                      size="medium"
-                      inputProps={{ maxLength: 8 }}
-                    />
-                  )}
-                />
+                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                 {/* Preview de tarjeta */}
+                 <Box>
+                   <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+                     Información de tarjeta
+                   </Typography>
+                   <Card 
+                     sx={{ 
+                       background: cardType ? `linear-gradient(135deg, ${cardType.color} 0%, ${cardType.color}dd 100%)` : 'linear-gradient(135deg, #666 0%, #999 100%)',
+                       color: 'white',
+                       mb: 3,
+                       borderRadius: 2
+                     }}
+                   >
+                     <CardContent sx={{ p: 3 }}>
+                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                         <Typography variant="h6" sx={{ fontSize: '1.2rem' }}>
+                           {cardType ? cardType.name : 'Tarjeta'}
+                         </Typography>
+                         <Typography variant="h3">
+                           {cardType ? cardType.logo : '💳'}
+                         </Typography>
+                       </Box>
+                       <Typography variant="h6" sx={{ fontFamily: 'monospace', mb: 2, letterSpacing: 2 }}>
+                         {cardNumber || '**** **** **** ****'}
+                       </Typography>
+                       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                         <Typography variant="body1">
+                           {cardName || 'NOMBRE DEL TITULAR'}
+                         </Typography>
+                         <Typography variant="body1">
+                           {cardExpiry || 'MM/YY'}
+                         </Typography>
+                       </Box>
+                     </CardContent>
+                   </Card>
+                 </Box>
 
-                {/* Dirección */}
-                <Controller
-                  name="direccion"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Dirección"
-                      placeholder="Tu dirección completa"
-                      error={!!errors.direccion}
-                      helperText={errors.direccion?.message}
-                      fullWidth
-                      variant="outlined"
-                      size="medium"
-                    />
-                  )}
-                />
+                 {/* Número de tarjeta */}
+                 <Controller
+                   name="numeroTarjeta"
+                   control={control}
+                   render={({ field }) => (
+                     <TextField
+                       {...field}
+                       label="Número de tarjeta"
+                       placeholder="1234 5678 9012 3456"
+                       error={!!errors.numeroTarjeta}
+                       helperText={errors.numeroTarjeta?.message}
+                       fullWidth
+                       variant="outlined"
+                       size="medium"
+                       inputProps={{ maxLength: 19 }}
+                       onChange={(e) => {
+                         // Formatear número de tarjeta
+                         let value = e.target.value.replace(/\s/g, '').replace(/\D/g, '');
+                         if (value.length > 16) value = value.slice(0, 16);
+                         
+                         // Agregar espacios cada 4 dígitos
+                         const formatted = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+                         field.onChange(formatted);
+                       }}
+                     />
+                   )}
+                 />
 
-                {/* Preview de tarjeta */}
-                <Box>
-                  <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-                    Información de tarjeta
-                  </Typography>
-                  <Card 
-                    sx={{ 
-                      background: cardType ? `linear-gradient(135deg, ${cardType.color} 0%, ${cardType.color}dd 100%)` : 'linear-gradient(135deg, #666 0%, #999 100%)',
-                      color: 'white',
-                      mb: 3,
-                      borderRadius: 2
-                    }}
-                  >
-                    <CardContent sx={{ p: 3 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                        <Typography variant="h6" sx={{ fontSize: '1.2rem' }}>
-                          {cardType ? cardType.name : 'Tarjeta'}
-                        </Typography>
-                        <Typography variant="h3">
-                          {cardType ? cardType.logo : '💳'}
-                        </Typography>
-                      </Box>
-                      <Typography variant="h6" sx={{ fontFamily: 'monospace', mb: 2, letterSpacing: 2 }}>
-                        {cardNumber || '**** **** **** ****'}
-                      </Typography>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="body1">
-                          {cardName || 'NOMBRE DEL TITULAR'}
-                        </Typography>
-                        <Typography variant="body1">
-                          {cardExpiry || 'MM/YY'}
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Box>
+                 {/* Nombre de la tarjeta */}
+                 <Controller
+                   name="nombreTarjeta"
+                   control={control}
+                   render={({ field }) => (
+                     <TextField
+                       {...field}
+                       label="Nombre de la tarjeta"
+                       placeholder="NOMBRE APELLIDO"
+                       error={!!errors.nombreTarjeta}
+                       helperText={errors.nombreTarjeta?.message}
+                       fullWidth
+                       variant="outlined"
+                       size="medium"
+                     />
+                   )}
+                 />
 
-                {/* Número de tarjeta */}
-                <Controller
-                  name="numeroTarjeta"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Número de tarjeta"
-                      placeholder="1234 5678 9012 3456"
-                      error={!!errors.numeroTarjeta}
-                      helperText={errors.numeroTarjeta?.message}
-                      fullWidth
-                      variant="outlined"
-                      size="medium"
-                      inputProps={{ maxLength: 19 }}
-                    />
-                  )}
-                />
+                 {/* Fecha de expiración y CVV */}
+                 <Box sx={{ display: 'flex', gap: 2 }}>
+                   <Controller
+                     name="fechaExpiracion"
+                     control={control}
+                     render={({ field }) => (
+                       <TextField
+                         {...field}
+                         label="Fecha de expiración (MM/YY)"
+                         placeholder="12/25"
+                         error={!!errors.fechaExpiracion}
+                         helperText={errors.fechaExpiracion?.message}
+                         fullWidth
+                         variant="outlined"
+                         size="medium"
+                         inputProps={{ maxLength: 5 }}
+                         onChange={(e) => {
+                           // Formatear fecha de expiración
+                           let value = e.target.value.replace(/\D/g, '');
+                           if (value.length > 4) value = value.slice(0, 4);
+                           
+                           // Agregar / después del mes
+                           if (value.length >= 2) {
+                             value = value.slice(0, 2) + '/' + value.slice(2);
+                           }
+                           field.onChange(value);
+                         }}
+                       />
+                     )}
+                   />
 
-                {/* Nombre de la tarjeta */}
-                <Controller
-                  name="nombreTarjeta"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Nombre de la tarjeta"
-                      placeholder="NOMBRE APELLIDO"
-                      error={!!errors.nombreTarjeta}
-                      helperText={errors.nombreTarjeta?.message}
-                      fullWidth
-                      variant="outlined"
-                      size="medium"
-                    />
-                  )}
-                />
+                   <Controller
+                     name="cvv"
+                     control={control}
+                     render={({ field }) => (
+                       <TextField
+                         {...field}
+                         label="CVV"
+                         placeholder="123"
+                         error={!!errors.cvv}
+                         helperText={errors.cvv?.message}
+                         sx={{ minWidth: '120px' }}
+                         variant="outlined"
+                         size="medium"
+                         inputProps={{ maxLength: 4 }}
+                       />
+                     )}
+                   />
+                 </Box>
 
-                {/* Fecha de expiración y CVV */}
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Controller
-                    name="fechaExpiracion"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="Fecha de expiración (MM/YY)"
-                        placeholder="12/25"
-                        error={!!errors.fechaExpiracion}
-                        helperText={errors.fechaExpiracion?.message}
-                        fullWidth
-                        variant="outlined"
-                        size="medium"
-                        inputProps={{ maxLength: 5 }}
-                      />
-                    )}
-                  />
+                 {/* Teléfono */}
+                 <Controller
+                   name="telefono"
+                   control={control}
+                   render={({ field }) => (
+                     <TextField
+                       {...field}
+                       label="Teléfono"
+                       type="tel"
+                       placeholder="12345678"
+                       error={!!errors.telefono}
+                       helperText={errors.telefono?.message}
+                       fullWidth
+                       variant="outlined"
+                       size="medium"
+                       inputProps={{ maxLength: 8 }}
+                     />
+                   )}
+                 />
 
-                  <Controller
-                    name="cvv"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="CVV"
-                        placeholder="123"
-                        error={!!errors.cvv}
-                        helperText={errors.cvv?.message}
-                        sx={{ minWidth: '120px' }}
-                        variant="outlined"
-                        size="medium"
-                        inputProps={{ maxLength: 4 }}
-                      />
-                    )}
-                  />
-                </Box>
-              </Box>
+                 {/* Dirección */}
+                 <Controller
+                   name="direccion"
+                   control={control}
+                   render={({ field }) => (
+                     <TextField
+                       {...field}
+                       label="Dirección"
+                       placeholder="Tu dirección completa"
+                       error={!!errors.direccion}
+                       helperText={errors.direccion?.message}
+                       fullWidth
+                       variant="outlined"
+                       size="medium"
+                     />
+                   )}
+                 />
+               </Box>
 
               {/* Botón de pago */}
               <Box sx={{ mt: 5, pt: 4, borderTop: '2px solid', borderColor: 'divider' }}>
