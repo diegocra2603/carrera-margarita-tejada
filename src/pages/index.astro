@@ -3,6 +3,9 @@ import Layout from '../layouts/Layout.astro';
 import MenuHeader from '../components/MenuHeader';
 import BannerInicio from '../components/BannerInicio';
 import DistanciaCompra from '../components/DistanciaCompra';
+import SoldOut from '../components/SoldOut';
+import TiempoFinalizado from '../components/TiempoFinalizado';
+import RegistraTicket from '../components/RegistraTicket';
 import FooterMenu from '../components/FooterMenu';
 import NavigationMenu from '../components/NavigationMenu';
 import ScrollAnimation from '../components/ScrollAnimation';
@@ -26,115 +29,17 @@ import ReactCounter from '../components/ReactCounter';
 
 	<div class="container mx-auto sm:px-10 px-5 overflow-hidden">
 		<ScrollAnimation client:load animation="fade-up" delay={0.1}>
-			<!-- <div class="pt-20 pb-10">
-				<div class="text-2xl font-bold font-azul">
-					¡Sold out y listos para la carrera! 🏃
-				</div>
-				<div class="text-xl pb-5">
-					<br />
-					¡Gracias por sumarse! <br />
-					Nos vemos el 6 de octubre apoyando a @FundacionMargaritaTejada. <br /> 
-					¡#AtletasQueInspiran estamos listos para darlo todo!
-				</div>
-			</div> -->
-			<div class="pt-10">
-				<div class="text-2xl font-bold font-azul">
-					Comprar
-				</div>
-				<div class="text-xl">
-					Quieres comprar tu Ticket digital presiona comprar ahora
-				</div>
-			</div>
-			<div class="grid sm:grid-cols-4 grid-cols-2 sm:gap-5 gap-3 pt-10 pb-10">
-				<div id="Comprar" class="bannerPrecio bg-cover bg-center" data-aos="flip-left" data-aos-duration="1000">
-					<a>
-						<div class="relative sm:h-full sm:w-full h-[120px]">
-							<div class="absolute w-full h-[84%] flex justify-center items-center">
-								<div>
-									<div class="font-amarillo sm:text-md text-xs">Valor</div>
-									<div class="sm:text-3xl text-2xl font-bold text-white">
-										Q125
-									</div>
-								</div>
-							</div>
-							<div class="bg-[#F5D72C] absolute z-10 bottom-0 w-full text-center font-bold font-azul pt-1 pb-1 sm:text-xl text-xs">
-								Comprar ahora
-							</div>
-						</div>
-					</a>
-				</div>
-	
-				<div class="bannerDistancia bg-cover bg-center sm:col-span-3">
-					<div class="flex pt-10 pb-10">
-						<div class="sm:w-[340px] w-[100px] mx-auto" data-aos="zoom-in" data-aos-duration="500">
-							<img class="w-full" src="/distancia-trans.png" alt="Distancia">
-						</div>
-					</div>
-				</div>
-			</div>
+			{/* <SoldOut client:load /> */}
+			<DistanciaCompra client:load />
 		</ScrollAnimation>
 
-		<!--
-		<div class="pt-10">
-			<div class="text-2xl font-bold font-azul">
-				Comprar
-			</div>
-			<div class="text-xl">
-				Quieres comprar tu Ticket digital presiona comprar ahora
-			</div>
-		</div>
-		<div class="grid sm:grid-cols-4 grid-cols-2 sm:gap-5 gap-3 pt-10 pb-10">
-			<div id="Comprar" class="bannerPrecio bg-cover bg-center" data-aos="flip-left" data-aos-duration="1000">
-				<a>
-					<div class="relative sm:h-full sm:w-full h-[120px]">
-						<div class="absolute w-full h-[84%] flex justify-center items-center">
-							<div>
-								<div class="font-amarillo sm:text-md text-xs">Valor</div>
-								<div class="sm:text-3xl text-2xl font-bold text-white">
-									Q125
-								</div>
-							</div>
-						</div>
-						<div class="bg-[#F5D72C] absolute z-10 bottom-0 w-full text-center font-bold font-azul pt-1 pb-1 sm:text-xl text-xs">
-							Comprar ahora
-						</div>
-					</div>
-				</a>
-			</div>
 
-			<div class="bannerDistancia bg-cover bg-center sm:col-span-3">
-				<div class="flex pt-10 pb-10">
-					<div class="sm:w-[340px] w-[100px] mx-auto" data-aos="zoom-in" data-aos-duration="500">
-						<img class="w-full" src="/distancia-trans.png" alt="Distancia">
-					</div>
-				</div>
-			</div>
-		</div>
-		-->
 
 		<hr class="border-1 border-yellow-400">
 
 		<ScrollAnimation client:load animation="fade-up" delay={0.2}>
-			<div class="pt-10 pb-10">
-				<!-- <div class="text-2xl font-bold font-azul">
-					¡Tiempo finalizado!
-				</div>
-				<div class="text-xl pb-5">
-					Si no pudiste registrarte en nuestro sitio, lleva tu ticket y el día del evento puedes hacerlo.
-				</div> -->
-				<div id="btnRegistro" class="bannerDistancia bg-cover bg-center sm:col-span-3">
-					<div class="flex pt-10 pb-10">
-						<div class="mx-auto text-center" data-aos="zoom-in" data-aos-duration="500">
-							<a href="/registro-ticket" class="bg-yellow-400 border-2 border-yellow-400 text-black font-bold py-4 px-8 rounded-lg text-xl hover:bg-transparent hover:text-white hover:border hover:border-2 hover:border-yellow-400 transition duration-300 ease-in-out">
-								REGISTRA TU TICKET
-							</a>
-						</div>
-					</div>
-				</div>
-				<!--
-				
-				-->
-			</div>
+			{/* <TiempoFinalizado client:load /> */}
+			<RegistraTicket client:load />
 		</ScrollAnimation>
 
 		<hr class="border-1 border-yellow-400">
