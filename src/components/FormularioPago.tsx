@@ -122,6 +122,29 @@ export default function FormularioPago() {
   };
 
   const handleGenerarLink = () => {
+    // Mostrar todos los datos en consola
+    console.log('=== DATOS DE COMPRA ===');
+    console.log('Participantes:', datosCompra?.participantes);
+    console.log('Total:', datosCompra?.total);
+    console.log('Cantidad:', datosCompra?.cantidad);
+    
+    console.log('\n=== DATOS DE PAGO ===');
+    console.log('Nombre:', datosPago.nombre);
+    console.log('Email:', datosPago.email);
+    console.log('Teléfono:', datosPago.telefono);
+    console.log('Dirección:', datosPago.direccion);
+    
+    console.log('\n=== MÉTODO DE PAGO ===');
+    console.log('Método seleccionado:', metodoPago);
+    
+    console.log('\n=== RESUMEN COMPLETO ===');
+    console.log({
+      datosCompra,
+      datosPago,
+      metodoPago,
+      linkGenerado: generarLinkZigi()
+    });
+    
     setModalQROpen(true);
   };
 
