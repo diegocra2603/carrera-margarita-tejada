@@ -8,6 +8,8 @@ import 'dayjs/locale/es';
 import DatosPersonalesPago from './DatosPersonalesPago';
 import InformacionTarjeta from './InformacionTarjeta';
 import DetallesCompra from './DetallesCompra';
+import SelectorMetodoPago from './SelectorMetodoPago';
+import ModalQR from './ModalQR';
 
 // Configurar dayjs para usar español
 dayjs.locale('es');
@@ -43,6 +45,8 @@ export default function FormularioPago() {
   const [datosCompra, setDatosCompra] = useState<DatosCompra | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [metodoPago, setMetodoPago] = useState('tarjeta');
+  const [modalQROpen, setModalQROpen] = useState(false);
   const [cardNumber, setCardNumber] = useState('');
   const [cardName, setCardName] = useState('');
   const [cardExpiry, setCardExpiry] = useState('');
@@ -80,18 +84,45 @@ export default function FormularioPago() {
     }));
   };
 
-  // Validar formulario
+  // Validar formulario según el método de pago
   const validarFormulario = () => {
-    return (
+    const datosPersonalesValidos = (
       datosPago.nombre.trim() !== '' &&
       datosPago.email.trim() !== '' &&
       datosPago.telefono.trim() !== '' &&
-      datosPago.direccion.trim() !== '' &&
-      cardNumber.replace(/\s/g, '').length >= 13 &&
-      cardName.trim() !== '' &&
-      cardExpiry.length === 5 &&
-      cardCvv.length >= 3
+      datosPago.direccion.trim() !== ''
     );
+
+    if (metodoPago === 'tarjeta') {
+      return datosPersonalesValidos &&
+        cardNumber.replace(/\s/g, '').length >= 13 &&
+        cardName.trim() !== '' &&
+        cardExpiry.length === 5 &&
+        cardCvv.length >= 3;
+    } else {
+      // Para Zigi solo necesitamos datos personales
+      return datosPersonalesValidos;
+    }
+  };
+
+  // Generar link de pago para Zigi
+  const generarLinkZigi = () => {
+    // Aquí podrías integrar con la API real de Zigi
+    // Por ahora generamos un link de ejemplo
+    const linkBase = 'https://zigi.com.gt/pay';
+    const parametros = new URLSearchParams({
+      amount: datosCompra?.total.toString() || '0',
+      reference: `carrera-${Date.now()}`,
+      description: 'Carrera Margarita Tejada',
+      email: datosPago.email,
+      name: datosPago.nombre
+    });
+    
+    return `${linkBase}?${parametros.toString()}`;
+  };
+
+  const handleGenerarLink = () => {
+    setModalQROpen(true);
   };
 
   const handlePagar = async () => {
@@ -100,9 +131,14 @@ export default function FormularioPago() {
       return;
     }
 
+    if (metodoPago === 'zigi') {
+      handleGenerarLink();
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      // Simular procesamiento de pago
+      // Simular procesamiento de pago con tarjeta
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Limpiar sesión
@@ -175,17 +211,57 @@ export default function FormularioPago() {
                     onInputChange={handleInputChange}
                   />
 
-                  {/* Componente de información de tarjeta */}
-                  <InformacionTarjeta
-                    cardNumber={cardNumber}
-                    cardName={cardName}
-                    cardExpiry={cardExpiry}
-                    cardCvv={cardCvv}
-                    onCardNumberChange={setCardNumber}
-                    onCardNameChange={setCardName}
-                    onCardExpiryChange={setCardExpiry}
-                    onCardCvvChange={setCardCvv}
+                  {/* Selector de método de pago */}
+                  <SelectorMetodoPago
+                    metodoSeleccionado={metodoPago}
+                    onMetodoChange={setMetodoPago}
                   />
+
+                  {/* Componente de información de tarjeta - solo si se selecciona tarjeta */}
+                  {metodoPago === 'tarjeta' && (
+                    <InformacionTarjeta
+                      cardNumber={cardNumber}
+                      cardName={cardName}
+                      cardExpiry={cardExpiry}
+                      cardCvv={cardCvv}
+                      onCardNumberChange={setCardNumber}
+                      onCardNameChange={setCardName}
+                      onCardExpiryChange={setCardExpiry}
+                      onCardCvvChange={setCardCvv}
+                    />
+                  )}
+
+                  {/* Botón para generar link de Zigi - solo si se selecciona Zigi */}
+                  {metodoPago === 'zigi' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-blue-50 border border-blue-200 rounded-lg"
+                    >
+                      <div className="text-center">
+                        <img 
+                          src="/zigi.png" 
+                          alt="Zigi" 
+                          className="w-12 h-12 mx-auto mb-3"
+                        />
+                        <p className="text-blue-800 mb-3">
+                          Haz clic en "Generar Link" para crear tu enlace de pago con Zigi
+                        </p>
+                        <Button
+                          variant="contained"
+                          onClick={handleGenerarLink}
+                          sx={{
+                            bgcolor: '#003B7A',
+                            '&:hover': {
+                              bgcolor: '#002a5a'
+                            }
+                          }}
+                        >
+                          Generar Link
+                        </Button>
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
 
                 {/* Botón de pago */}
@@ -202,7 +278,9 @@ export default function FormularioPago() {
                       fontWeight: 'bold'
                     }}
                   >
-                    {isSubmitting ? 'Procesando...' : `Confirmar y pagar Q${datosCompra.total}`}
+                    {isSubmitting ? 'Procesando...' : 
+                     metodoPago === 'zigi' ? 'Generar Link de Pago' : 
+                     `Confirmar y pagar Q${datosCompra.total}`}
                   </Button>
                 </Box>
 
@@ -216,6 +294,13 @@ export default function FormularioPago() {
             </div>
           </motion.div>
         </div>
+
+        {/* Modal QR para Zigi */}
+        <ModalQR
+          open={modalQROpen}
+          onClose={() => setModalQROpen(false)}
+          linkPago={generarLinkZigi()}
+        />
       </LocalizationProvider>
     </ThemeProvider>
   );
