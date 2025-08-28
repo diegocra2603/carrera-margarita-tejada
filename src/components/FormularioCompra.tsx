@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -32,6 +32,38 @@ export default function FormularioCompra() {
     }
   ]);
   const [isValid, setIsValid] = useState<boolean>(false);
+  const [hasExistingData, setHasExistingData] = useState<boolean>(false);
+  const [showDataLoaded, setShowDataLoaded] = useState<boolean>(false);
+
+  // Cargar datos existentes al montar el componente
+  useEffect(() => {
+    const loadExistingData = () => {
+      const storedData = sessionStorage.getItem('datosCompra');
+      if (storedData) {
+        try {
+          const parsedData = JSON.parse(storedData);
+          
+          // Verificar si los datos son válidos para el formulario de compra
+          if (parsedData.participantes && parsedData.participantes.length > 0) {
+            setHasExistingData(true);
+            setCantidad(parsedData.participantes.length);
+            setParticipantes(parsedData.participantes);
+            setIsValid(validarFormulario(parsedData.participantes));
+            
+            // Mostrar alerta de datos cargados
+            setShowDataLoaded(true);
+            
+            // Ocultar la alerta después de 5 segundos
+            setTimeout(() => setShowDataLoaded(false), 5000);
+          }
+        } catch (error) {
+          console.error('Error al cargar datos de la sesión:', error);
+        }
+      }
+    };
+
+    loadExistingData();
+  }, []);
 
   // Validar que todos los campos obligatorios estén completos
   const validarFormulario = (participantes: Participante[]) => {
@@ -117,6 +149,25 @@ export default function FormularioCompra() {
     }, 0);
   };
 
+  // Función para borrar datos de la sesión
+  const handleClearData = () => {
+    sessionStorage.removeItem('datosCompra');
+    setHasExistingData(false);
+    setShowDataLoaded(false);
+    
+    // Resetear el formulario
+    setCantidad(1);
+    setParticipantes([{
+      id: 1,
+      nombre: '',
+      apellido: '',
+      distancia: '',
+      fechaNacimiento: '',
+      ipu: ''
+    }]);
+    setIsValid(false);
+  };
+
   const handleContinuar = () => {
     if (isValid) {
       // Guardar datos en sessionStorage para la página de pago
@@ -140,6 +191,29 @@ export default function FormularioCompra() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
+          {/* Alerta de datos cargados */}
+          {showDataLoaded && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg"
+            >
+              <div className="flex justify-between items-center">
+                <p className="text-blue-800">
+                  Se han cargado datos existentes de una sesión anterior. Puedes continuar con tu compra o borrar los datos para empezar de nuevo.
+                </p>
+                {hasExistingData && (
+                  <button 
+                    onClick={handleClearData}
+                    className="ml-4 px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition-colors"
+                  >
+                    Borrar datos
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          )}
+
           {/* Selección de cantidad */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">

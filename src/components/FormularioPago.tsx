@@ -42,6 +42,7 @@ interface DatosCompra {
 export default function FormularioPago() {
   const [datosCompra, setDatosCompra] = useState<DatosCompra | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [cardNumber, setCardNumber] = useState('');
   const [cardName, setCardName] = useState('');
   const [cardExpiry, setCardExpiry] = useState('');
@@ -60,9 +61,10 @@ export default function FormularioPago() {
       try {
         const datos = JSON.parse(datosGuardados);
         setDatosCompra(datos);
+        setIsLoading(false);
       } catch (error) {
         console.error('Error al cargar datos de compra:', error);
-        // Redirigir a compra si no hay datos
+        // Redirigir a compra si hay error en los datos
         window.location.href = '/compra';
       }
     } else {
@@ -117,12 +119,28 @@ export default function FormularioPago() {
     }
   };
 
-  if (!datosCompra) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Cargando detalles de compra...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!datosCompra) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">No se encontraron datos de compra</p>
+          <button 
+            onClick={() => window.location.href = '/compra'}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Ir a compra
+          </button>
         </div>
       </div>
     );
@@ -137,16 +155,6 @@ export default function FormularioPago() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {/* Título */}
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Confirmar Pago
-              </h1>
-              <p className="text-gray-600">
-                Revisa los detalles de tu compra y completa la información de pago
-              </p>
-            </div>
-
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Componente de detalles de compra */}
               <DetallesCompra 

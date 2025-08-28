@@ -13,6 +13,33 @@ import FooterMenu from '../components/FooterMenu';
   <NavigationMenu client:load />
   
   <div class="container mx-auto sm:px-10 px-5">
+    <!-- Encabezado de la página -->
+    <div class="pt-10">
+      <div class="flex justify-between items-start">
+        <div>
+          <div class="text-2xl font-bold font-azul">
+            Confirmar Pago
+          </div>
+          <div class="text-xl">
+            Revisa los detalles de tu compra y completa la información de pago
+          </div>
+        </div>
+        
+        <!-- Botón de regresar con Material-UI -->
+        <button 
+          onclick="window.history.back()" 
+          class="inline-flex items-center px-4 py-2 bg-transparent text-[#003B7A] border border-[#003B7A] rounded-full hover:bg-[#003B7A] hover:text-white transition-colors shadow-md hover:shadow-lg"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Regresar
+        </button>
+      </div>
+    </div>
+    
+    <hr class="border-1 border-yellow-400 my-8">
+
     <div class="bg-gray-50 my-10">
       <div class="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:max-w-7xl lg:px-8">
         <FormularioPago client:load />
