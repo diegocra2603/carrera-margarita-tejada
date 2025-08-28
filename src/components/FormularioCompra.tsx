@@ -1,381 +1,361 @@
-import React, { useState, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { 
-  TextField, 
-  Button, 
-  FormControl, 
-  InputLabel, 
-  Select, 
-  MenuItem, 
-  Box,
-  Typography,
-  Paper,
-  ThemeProvider,
-  createTheme,
-  Alert
-} from '@mui/material';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 
-// Crear tema personalizado con el color corporativo
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#003B7A',
-      light: '#1a4a8a',
-      dark: '#002a5a',
-      contrastText: '#ffffff',
-    },
-  },
-});
+// Configurar dayjs para usar español
+dayjs.locale('es');
 
-// Esquema de validación con Zod
-const compraSchema = z.object({
-  nombre: z.string()
-    .min(2, 'El nombre debe tener al menos 2 caracteres')
-    .max(50, 'El nombre no puede exceder 50 caracteres'),
-  apellido: z.string()
-    .min(2, 'El apellido debe tener al menos 2 caracteres')
-    .max(50, 'El apellido no puede exceder 50 caracteres'),
-  correo: z.string()
-    .email('Ingresa un correo electrónico válido'),
-  fechaNacimiento: z.any()
-    .refine((date) => {
-      if (!date) return false;
-      const birthDate = dayjs(date);
-      const today = dayjs();
-      const age = today.diff(birthDate, 'year');
-      return age >= 5 && age <= 100;
-    }, 'La edad debe estar entre 5 y 100 años'),
-  distancia: z.string()
-    .min(1, 'Selecciona una distancia'),
-  cantidad: z.string()
-    .min(1, 'Selecciona una cantidad')
-    .refine((val) => parseInt(val) >= 1 && parseInt(val) <= 10, 'La cantidad debe estar entre 1 y 10')
-});
-
-type CompraFormData = z.infer<typeof compraSchema>;
+interface Participante {
+  id: number;
+  nombre: string;
+  apellido: string;
+  distancia: string;
+  fechaNacimiento: string;
+  ipu: string;
+}
 
 export default function FormularioCompra() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasExistingData, setHasExistingData] = useState(false);
-  const [showDataLoaded, setShowDataLoaded] = useState(false);
-  
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    reset
-  } = useForm<CompraFormData>({
-    resolver: zodResolver(compraSchema),
-    defaultValues: {
+  const [cantidad, setCantidad] = useState<number>(1);
+  const [participantes, setParticipantes] = useState<Participante[]>([
+    {
+      id: 1,
       nombre: '',
       apellido: '',
-      correo: '',
-      fechaNacimiento: null,
       distancia: '',
-      cantidad: ''
+      fechaNacimiento: '',
+      ipu: ''
     }
-  });
+  ]);
+  const [isValid, setIsValid] = useState<boolean>(false);
 
-  // Cargar datos existentes de la sesión al montar el componente
-  useEffect(() => {
-    const loadExistingData = () => {
-      const storedData = sessionStorage.getItem('purchaseData');
-      if (storedData) {
-        try {
-          const parsedData = JSON.parse(storedData);
-          
-          // Verificar si los datos son válidos para el formulario de compra
-          if (parsedData.nombre && parsedData.apellido && parsedData.correo) {
-            setHasExistingData(true);
-            
-            // Cargar los datos en el formulario
-            setValue('nombre', parsedData.nombre);
-            setValue('apellido', parsedData.apellido);
-            setValue('correo', parsedData.correo);
-            
-            // Convertir la fecha de nacimiento de string a dayjs
-            if (parsedData.fechaNacimiento) {
-              const [day, month, year] = parsedData.fechaNacimiento.split('/');
-              const birthDate = dayjs(`${year}-${month}-${day}`);
-              setValue('fechaNacimiento', birthDate);
-            }
-            
-            setValue('distancia', parsedData.distancia || '');
-            setValue('cantidad', parsedData.cantidad || '');
-            
-            // Mostrar alerta de datos cargados solo si el usuario regresa de la página de pago
-            const isReturningFromPayment = sessionStorage.getItem('returningFromPayment');
-            if (isReturningFromPayment) {
-              setShowDataLoaded(true);
-              sessionStorage.removeItem('returningFromPayment');
-              
-              // Ocultar la alerta después de 5 segundos
-              setTimeout(() => setShowDataLoaded(false), 5000);
-            }
-          }
-        } catch (error) {
-          console.error('Error al cargar datos de la sesión:', error);
-        }
-      }
-    };
-
-    loadExistingData();
-  }, [setValue]);
-
-  // Función para borrar datos de la sesión
-  const handleClearData = () => {
-    sessionStorage.removeItem('purchaseData');
-    setHasExistingData(false);
-    setShowDataLoaded(false);
-    
-    // Resetear el formulario
-    reset({
-      nombre: '',
-      apellido: '',
-      correo: '',
-      fechaNacimiento: null,
-      distancia: '',
-      cantidad: ''
-    });
+  // Validar que todos los campos obligatorios estén completos
+  const validarFormulario = (participantes: Participante[]) => {
+    return participantes.every(participante => 
+      participante.nombre.trim() !== '' &&
+      participante.apellido.trim() !== '' &&
+      participante.distancia !== '' &&
+      participante.fechaNacimiento !== ''
+    );
   };
 
-  const onSubmit = async (data: CompraFormData) => {
-    setIsSubmitting(true);
-    try {
-      // Guardar datos en sessionStorage
-      const purchaseData = {
-        ...data,
-        fechaNacimiento: data.fechaNacimiento ? data.fechaNacimiento.format('DD/MM/YYYY') : '',
-        total: parseInt(data.cantidad) * 125, // Q125 por ticket
-        timestamp: new Date().toISOString()
+  // Actualizar cantidad y regenerar array de participantes
+  const handleCantidadChange = (nuevaCantidad: number) => {
+    setCantidad(nuevaCantidad);
+    
+    const nuevosParticipantes: Participante[] = [];
+    for (let i = 1; i <= nuevaCantidad; i++) {
+      // Mantener datos existentes si ya existen
+      const participanteExistente = participantes.find(p => p.id === i);
+      nuevosParticipantes.push({
+        id: i,
+        nombre: participanteExistente?.nombre || '',
+        apellido: participanteExistente?.apellido || '',
+        distancia: participanteExistente?.distancia || '',
+        fechaNacimiento: participanteExistente?.fechaNacimiento || '',
+        ipu: participanteExistente?.ipu || ''
+      });
+    }
+    
+    setParticipantes(nuevosParticipantes);
+    setIsValid(validarFormulario(nuevosParticipantes));
+  };
+
+  // Actualizar datos de un participante específico
+  const handleParticipanteChange = (id: number, campo: keyof Participante, valor: string) => {
+    const nuevosParticipantes = participantes.map(participante =>
+      participante.id === id ? { ...participante, [campo]: valor } : participante
+    );
+    
+    setParticipantes(nuevosParticipantes);
+    setIsValid(validarFormulario(nuevosParticipantes));
+  };
+
+  // Actualizar fecha de nacimiento usando dayjs
+  const handleFechaNacimientoChange = (id: number, fecha: dayjs.Dayjs | null) => {
+    const fechaString = fecha ? fecha.format('YYYY-MM-DD') : '';
+    const nuevosParticipantes = participantes.map(participante =>
+      participante.id === id ? { ...participante, fechaNacimiento: fechaString } : participante
+    );
+    
+    setParticipantes(nuevosParticipantes);
+    setIsValid(validarFormulario(nuevosParticipantes));
+  };
+
+  // Calcular edad a partir de la fecha de nacimiento
+  const calcularEdad = (fechaNacimiento: string) => {
+    if (!fechaNacimiento) return 0;
+    const hoy = dayjs();
+    const fechaNac = dayjs(fechaNacimiento);
+    return hoy.diff(fechaNac, 'year');
+  };
+
+  // Validar distancia según edad
+  const validarDistancia = (edad: number, distancia: string) => {
+    if (edad < 13) return false; // Solo mayores de 13 años
+    if (distancia === '5K' || distancia === '10K') return true;
+    return false;
+  };
+
+  // Obtener precio por distancia
+  const obtenerPrecio = (distancia: string) => {
+    switch (distancia) {
+      case '5K': return 100;
+      case '10K': return 180;
+      default: return 0;
+    }
+  };
+
+  // Calcular total
+  const calcularTotal = () => {
+    return participantes.reduce((total, participante) => {
+      return total + obtenerPrecio(participante.distancia);
+    }, 0);
+  };
+
+  const handleContinuar = () => {
+    if (isValid) {
+      // Guardar datos en sessionStorage para la página de pago
+      const datosCompra = {
+        participantes,
+        total: calcularTotal(),
+        cantidad: participantes.length
       };
-      
-      sessionStorage.setItem('purchaseData', JSON.stringify(purchaseData));
+      sessionStorage.setItem('datosCompra', JSON.stringify(datosCompra));
       
       // Redirigir a la página de pago
       window.location.href = '/pagar';
-      
-    } catch (error) {
-      console.error('Error al procesar la compra:', error);
-      alert('Error al procesar la compra. Intenta nuevamente.');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
-        <Paper elevation={2} sx={{ p: 4 }}>
-          {/* Alerta de datos cargados */}
-          {showDataLoaded && (
-            <Alert 
-              severity="info" 
-              sx={{ mb: 3 }}
-              action={
-                hasExistingData && (
-                  <Button 
-                    color="inherit" 
-                    size="small" 
-                    onClick={handleClearData}
-                    sx={{ ml: 2 }}
-                  >
-                    Borrar datos
-                  </Button>
-                )
-              }
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+      <div className="p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Selección de cantidad */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Selecciona la cantidad de tickets
+            </h3>
+            <div className="flex items-center space-x-4">
+              <label className="text-sm font-medium text-gray-700">
+                Cantidad:
+              </label>
+              <select
+                value={cantidad}
+                onChange={(e) => handleCantidadChange(Number(e.target.value))}
+                className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                {[1, 2, 3, 4, 5].map(num => (
+                  <option key={num} value={num}>
+                    {num} {num === 1 ? 'ticket' : 'tickets'}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Formularios de participantes */}
+          <div className="space-y-6">
+            {participantes.map((participante, index) => {
+              const edad = calcularEdad(participante.fechaNacimiento);
+              const distanciaValida = validarDistancia(edad, participante.distancia);
+              const precio = obtenerPrecio(participante.distancia);
+              
+              return (
+                <motion.div
+                  key={participante.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="border border-gray-200 rounded-lg p-6 bg-gray-50"
+                >
+                  <h4 className="text-lg font-medium text-gray-900 mb-4">
+                    Participante {participante.id}
+                  </h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Nombre */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Nombre *
+                      </label>
+                      <input
+                        type="text"
+                        value={participante.nombre}
+                        onChange={(e) => handleParticipanteChange(participante.id, 'nombre', e.target.value)}
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Ingresa tu nombre"
+                      />
+                    </div>
+
+                    {/* Apellido */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Apellido *
+                      </label>
+                      <input
+                        type="text"
+                        value={participante.apellido}
+                        onChange={(e) => handleParticipanteChange(participante.id, 'apellido', e.target.value)}
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Ingresa tu apellido"
+                      />
+                    </div>
+
+                    {/* Fecha de nacimiento con DatePicker */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Fecha de nacimiento *
+                      </label>
+                      <DatePicker
+                        value={participante.fechaNacimiento ? dayjs(participante.fechaNacimiento) : null}
+                        onChange={(fecha) => handleFechaNacimientoChange(participante.id, fecha)}
+                        maxDate={dayjs().subtract(13, 'year')}
+                        minDate={dayjs().subtract(100, 'year')}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            size: "small",
+                            placeholder: "Selecciona tu fecha de nacimiento",
+                            sx: {
+                              '& .MuiOutlinedInput-root': {
+                                borderRadius: '6px',
+                                '& fieldset': {
+                                  borderColor: '#d1d5db',
+                                },
+                                '&:hover fieldset': {
+                                  borderColor: '#3b82f6',
+                                },
+                                '&.Mui-focused fieldset': {
+                                  borderColor: '#3b82f6',
+                                },
+                              },
+                            }
+                          }
+                        }}
+                      />
+                      {participante.fechaNacimiento && (
+                        <p className="text-sm text-gray-600 mt-1">
+                          Edad: {edad} años
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Distancia */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Distancia *
+                      </label>
+                      <select
+                        value={participante.distancia}
+                        onChange={(e) => handleParticipanteChange(participante.id, 'distancia', e.target.value)}
+                        className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          participante.distancia && !distanciaValida 
+                            ? 'border-red-500 focus:ring-red-500' 
+                            : 'border-gray-300 focus:ring-blue-500'
+                        }`}
+                      >
+                        <option value="">Selecciona una distancia</option>
+                        {edad >= 13 && (
+                          <>
+                            <option value="5K">5K - Q100</option>
+                            <option value="10K">10K - Q180</option>
+                          </>
+                        )}
+                      </select>
+                      {participante.distancia && !distanciaValida && (
+                        <p className="text-sm text-red-600 mt-1">
+                          Solo participantes mayores de 13 años pueden registrarse
+                        </p>
+                      )}
+                      {participante.distancia && precio > 0 && (
+                        <p className="text-sm text-green-600 mt-1 font-medium">
+                          Precio: Q{precio}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* IPU - Campo opcional */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        IPU (Identificación Personal Única)
+                        <span className="text-gray-500 text-xs ml-1">(Opcional)</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={participante.ipu}
+                        onChange={(e) => handleParticipanteChange(participante.id, 'ipu', e.target.value)}
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Ingresa tu IPU (opcional)"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Si tienes un IPU, puedes ingresarlo para facilitar tu identificación
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Resumen de total */}
+          {isValid && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg"
             >
-              Se han cargado datos existentes de una sesión anterior. Puedes continuar con tu compra o borrar los datos para empezar de nuevo.
-            </Alert>
+              <div className="flex justify-between items-center">
+                <span className="text-lg font-semibold text-gray-900">
+                  Total a pagar:
+                </span>
+                <span className="text-2xl font-bold text-blue-600">
+                  Q{calcularTotal()}
+                </span>
+              </div>
+            </motion.div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3, maxWidth: '800px' }}>
-              
-              {/* Nombre */}
-              <Controller
-                name="nombre"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Nombre"
-                    placeholder="Tu nombre"
-                    error={!!errors.nombre}
-                    helperText={errors.nombre?.message}
-                    fullWidth
-                    variant="outlined"
-                    size="medium"
-                  />
-                )}
-              />
+          {/* Botón continuar */}
+          <div className="mt-8 flex justify-end">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleContinuar}
+              disabled={!isValid}
+              className={`px-6 py-3 rounded-md font-medium transition-colors ${
+                isValid
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              {isValid ? 'Continuar con el pago' : 'Completa todos los campos'}
+            </motion.button>
+          </div>
 
-              {/* Apellido */}
-              <Controller
-                name="apellido"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Apellido"
-                    placeholder="Tu apellido"
-                    error={!!errors.apellido}
-                    helperText={errors.apellido?.message}
-                    fullWidth
-                    variant="outlined"
-                    size="medium"
-                  />
-                )}
-              />
-
-              {/* Correo electrónico */}
-              <Controller
-                name="correo"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Correo electrónico"
-                    type="email"
-                    placeholder="tu@email.com"
-                    error={!!errors.correo}
-                    helperText={errors.correo?.message}
-                    fullWidth
-                    variant="outlined"
-                    size="medium"
-                    sx={{ gridColumn: { xs: '1', sm: '1 / -1' } }}
-                  />
-                )}
-              />
-
-              {/* Fecha de nacimiento */}
-              <Controller
-                name="fechaNacimiento"
-                control={control}
-                render={({ field }) => (
-                  <DatePicker
-                    label="Fecha de nacimiento"
-                    value={field.value}
-                    onChange={(newValue) => field.onChange(newValue)}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        variant: "outlined",
-                        size: "medium",
-                        error: !!errors.fechaNacimiento,
-                        helperText: errors.fechaNacimiento?.message as string,
-                        placeholder: "Selecciona tu fecha de nacimiento"
-                      }
-                    }}
-                    maxDate={dayjs().subtract(5, 'year')}
-                    minDate={dayjs().subtract(100, 'year')}
-                  />
-                )}
-              />
-
-              {/* Distancia */}
-              <Controller
-                name="distancia"
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth error={!!errors.distancia}>
-                    <InputLabel>Distancia</InputLabel>
-                    <Select
-                      {...field}
-                      label="Distancia"
-                      size="medium"
-                    >
-                      <MenuItem value="">
-                        <em>Seleccionar</em>
-                      </MenuItem>
-                      <MenuItem value="5k">5K</MenuItem>
-                      <MenuItem value="10k">10K</MenuItem>
-                    </Select>
-                    {errors.distancia && (
-                      <Typography variant="caption" color="error">
-                        {errors.distancia.message}
-                      </Typography>
-                    )}
-                  </FormControl>
-                )}
-              />
-
-              {/* Cantidad */}
-              <Controller
-                name="cantidad"
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth error={!!errors.cantidad}>
-                    <InputLabel>Cantidad</InputLabel>
-                    <Select
-                      {...field}
-                      label="Cantidad"
-                      size="medium"
-                    >
-                      <MenuItem value="">
-                        <em>Seleccionar</em>
-                      </MenuItem>
-                      {Array.from({ length: 10 }, (_, i) => i + 1).map(num => (
-                        <MenuItem key={num} value={num.toString()}>
-                          Tickets {num}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {errors.cantidad && (
-                      <Typography variant="caption" color="error">
-                        {errors.cantidad.message}
-                      </Typography>
-                    )}
-                  </FormControl>
-                )}
-              />
-            </Box>
-
-            {/* Botones de acción */}
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              mt: 4, 
-              pt: 3, 
-              borderTop: '1px solid',
-              borderColor: 'divider'
-            }}>
-              {/* Botón para borrar datos (solo si hay datos existentes) */}
-              {hasExistingData && (
-                <Button
-                  variant="outlined"
-                  color="error"
-                  size="medium"
-                  onClick={handleClearData}
-                  disabled={isSubmitting}
-                >
-                  Borrar datos guardados
-                </Button>
-              )}
-              
-              {/* Botón de envío */}
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={isSubmitting}
-                size="large"
-                sx={{ ml: 'auto' }}
-              >
-                {isSubmitting ? 'Procesando...' : 'Confirmar y pagar'}
-              </Button>
-            </Box>
-          </form>
-        </Paper>
-      </LocalizationProvider>
-    </ThemeProvider>
+          {/* Resumen de validación */}
+          {!isValid && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md"
+            >
+              <p className="text-sm text-yellow-800">
+                Por favor completa todos los campos obligatorios (*) para continuar.
+              </p>
+            </motion.div>
+          )}
+        </motion.div>
+      </div>
+    </LocalizationProvider>
   );
 }
