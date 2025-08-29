@@ -51,10 +51,10 @@ export default function FormularioCompra() {
             setIsValid(validarFormulario(parsedData.participantes));
             
             // Mostrar alerta de datos cargados
-            setShowDataLoaded(true);
-            
-            // Ocultar la alerta después de 5 segundos
-            setTimeout(() => setShowDataLoaded(false), 5000);
+              setShowDataLoaded(true);
+              
+              // Ocultar la alerta después de 5 segundos
+              setTimeout(() => setShowDataLoaded(false), 5000);
           }
         } catch (error) {
           console.error('Error al cargar datos de la sesión:', error);
@@ -184,7 +184,7 @@ export default function FormularioCompra() {
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
       <div className="p-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -257,7 +257,7 @@ export default function FormularioCompra() {
                   </h4>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Nombre */}
+              {/* Nombre */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Nombre *
@@ -271,7 +271,7 @@ export default function FormularioCompra() {
                       />
                     </div>
 
-                    {/* Apellido */}
+              {/* Apellido */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Apellido *
@@ -290,14 +290,14 @@ export default function FormularioCompra() {
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Fecha de nacimiento *
                       </label>
-                      <DatePicker
+                  <DatePicker
                         value={participante.fechaNacimiento ? dayjs(participante.fechaNacimiento) : null}
                         onChange={(fecha) => handleFechaNacimientoChange(participante.id, fecha)}
                         maxDate={dayjs().subtract(13, 'year')}
                         minDate={dayjs().subtract(100, 'year')}
-                        slotProps={{
-                          textField: {
-                            fullWidth: true,
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
                             size: "small",
                             placeholder: "Selecciona tu fecha de nacimiento",
                             sx: {
@@ -324,7 +324,7 @@ export default function FormularioCompra() {
                       )}
                     </div>
 
-                    {/* Distancia */}
+              {/* Distancia */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Distancia *
@@ -430,6 +430,6 @@ export default function FormularioCompra() {
           )}
         </motion.div>
       </div>
-    </LocalizationProvider>
+      </LocalizationProvider>
   );
 }

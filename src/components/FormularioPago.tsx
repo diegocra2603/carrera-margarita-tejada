@@ -9,7 +9,7 @@ import DatosPersonalesPago from './DatosPersonalesPago';
 import InformacionTarjeta from './InformacionTarjeta';
 import DetallesCompra from './DetallesCompra';
 import SelectorMetodoPago from './SelectorMetodoPago';
-import ModalQR from './ModalQR';
+
 
 // Configurar dayjs para usar español
 dayjs.locale('es');
@@ -46,7 +46,7 @@ export default function FormularioPago() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [metodoPago, setMetodoPago] = useState('tarjeta');
-  const [modalQROpen, setModalQROpen] = useState(false);
+
   const [cardNumber, setCardNumber] = useState('');
   const [cardName, setCardName] = useState('');
   const [cardExpiry, setCardExpiry] = useState('');
@@ -121,58 +121,94 @@ export default function FormularioPago() {
     return `${linkBase}?${parametros.toString()}`;
   };
 
-  const handleGenerarLink = () => {
-    // Mostrar todos los datos en consola
-    console.log('=== DATOS DE COMPRA ===');
-    console.log('Participantes:', datosCompra?.participantes);
-    console.log('Total:', datosCompra?.total);
-    console.log('Cantidad:', datosCompra?.cantidad);
-    
-    console.log('\n=== DATOS DE PAGO ===');
-    console.log('Nombre:', datosPago.nombre);
-    console.log('Email:', datosPago.email);
-    console.log('Teléfono:', datosPago.telefono);
-    console.log('Dirección:', datosPago.direccion);
-    
-    console.log('\n=== MÉTODO DE PAGO ===');
-    console.log('Método seleccionado:', metodoPago);
-    
-    console.log('\n=== RESUMEN COMPLETO ===');
-    console.log({
-      datosCompra,
-      datosPago,
-      metodoPago,
-      linkGenerado: generarLinkZigi()
-    });
-    
-    setModalQROpen(true);
-  };
-
   const handlePagar = async () => {
     if (!validarFormulario()) {
       alert('Por favor completa todos los campos correctamente');
       return;
     }
 
-    if (metodoPago === 'zigi') {
-      handleGenerarLink();
-      return;
-    }
-
     setIsSubmitting(true);
+    
     try {
-      // Simular procesamiento de pago con tarjeta
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Limpiar sesión
-      sessionStorage.removeItem('datosCompra');
-      
-      alert('¡Pago procesado exitosamente!');
-      window.location.href = '/';
+      // Estructurar datos según el formato requerido
+      const datosEnviar = {
+        quantity: datosCompra?.cantidad || 0,
+        participants: datosCompra?.participantes.map(participante => ({
+          firstName: participante.nombre,
+          lastName: participante.apellido,
+          distance: participante.distancia,
+          birthDate: new Date(participante.fechaNacimiento).toISOString(),
+          ipu: participante.ipu || ""
+        })) || [],
+        purchaseData: {
+          firstName: datosPago.nombre.split(' ')[0] || datosPago.nombre,
+          lastName: datosPago.nombre.split(' ').slice(1).join(' ') || "",
+          email: datosPago.email,
+          address: datosPago.direccion
+        },
+        paymentMethod: metodoPago === 'tarjeta' ? 1 : 2,
+        cardData: metodoPago === 'tarjeta' ? {
+          cardNumber: cardNumber.replace(/\s/g, ''),
+          expiryMonth: cardExpiry.split('/')[0] || "",
+          expiryYear: cardExpiry.split('/')[1] || "",
+          cvv: cardCvv,
+          cardholderName: cardName
+        } : undefined
+      };
+
+   
+      console.log("datosEnviar", datosEnviar);
+
+      // Enviar datos a la API
+      console.log('\n=== ENVIANDO A LA API ===');
+      const response = await fetch('http://localhost:7227/api/v1/productcarrera/register-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(datosEnviar)
+      });
+
+      console.log('Status:', response.status);
+      console.log('Status Text:', response.statusText);
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Error response:', errorData);
+        throw new Error(`Error en la API: ${response.status} ${response.statusText}`);
+      }
+
+      const responseData = await response.json();
+      console.log('Respuesta de la API:', responseData);
+
+      if (metodoPago === 'zigi') {
+        // Para Zigi, redirigir a la página de confirmación
+        if (responseData.success && responseData.paymentUrl) {
+          // Guardar el link de pago en sessionStorage para la página de confirmación
+          sessionStorage.setItem('zigiPaymentUrl', responseData.paymentUrl);
+          sessionStorage.setItem('zigiPaymentData', JSON.stringify(responseData));
+          window.location.href = '/confirmacion';
+          return;
+        } else {
+          throw new Error('No se pudo generar el link de pago con Zigi');
+        }
+      }
+
+      // Para tarjeta de crédito, procesar respuesta exitosa
+      if (responseData.success) {
+        // Limpiar sesión
+        sessionStorage.removeItem('datosCompra');
+        
+        alert('¡Pago procesado exitosamente!');
+        window.location.href = '/';
+      } else {
+        throw new Error(responseData.message || 'Error en el procesamiento del pago');
+      }
       
     } catch (error) {
       console.error('Error al procesar el pago:', error);
-      alert('Error al procesar el pago. Intenta nuevamente.');
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      alert(`Error al procesar el pago: ${errorMessage}. Intenta nuevamente.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -254,7 +290,7 @@ export default function FormularioPago() {
                     />
                   )}
 
-                  {/* Botón para generar link de Zigi - solo si se selecciona Zigi */}
+                  {/* Información de Zigi - solo si se selecciona Zigi */}
                   {metodoPago === 'zigi' && (
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
@@ -268,44 +304,32 @@ export default function FormularioPago() {
                           className="w-12 h-12 mx-auto mb-3"
                         />
                         <p className="text-blue-800 mb-3">
-                          Haz clic en "Generar Link" para crear tu enlace de pago con Zigi
+                          Al hacer clic en "Generar Link de Pago" se creará tu enlace de pago con Zigi
                         </p>
-                        <Button
-                          variant="contained"
-                          onClick={handleGenerarLink}
-                          sx={{
-                            bgcolor: '#003B7A',
-                            '&:hover': {
-                              bgcolor: '#002a5a'
-                            }
-                          }}
-                        >
-                          Generar Link
-                        </Button>
                       </div>
                     </motion.div>
                   )}
                 </div>
 
-                {/* Botón de pago */}
-                <Box sx={{ mt: 5, pt: 4, borderTop: '2px solid', borderColor: 'divider' }}>
-                  <Button
-                    variant="contained"
+              {/* Botón de pago */}
+              <Box sx={{ mt: 5, pt: 4, borderTop: '2px solid', borderColor: 'divider' }}>
+                <Button
+                  variant="contained"
                     disabled={isSubmitting || !validarFormulario()}
-                    size="large"
-                    fullWidth
+                  size="large"
+                  fullWidth
                     onClick={handlePagar}
-                    sx={{ 
-                      py: 2, 
-                      fontSize: '1.1rem',
-                      fontWeight: 'bold'
-                    }}
-                  >
+                  sx={{ 
+                    py: 2, 
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}
+                >
                     {isSubmitting ? 'Procesando...' : 
                      metodoPago === 'zigi' ? 'Generar Link de Pago' : 
                      `Confirmar y pagar Q${datosCompra.total}`}
-                  </Button>
-                </Box>
+                </Button>
+              </Box>
 
                 {/* Información adicional */}
                 <div className="mt-4 p-3 bg-gray-50 rounded-md">
@@ -318,12 +342,7 @@ export default function FormularioPago() {
           </motion.div>
         </div>
 
-        {/* Modal QR para Zigi */}
-        <ModalQR
-          open={modalQROpen}
-          onClose={() => setModalQROpen(false)}
-          linkPago={generarLinkZigi()}
-        />
+
       </LocalizationProvider>
     </ThemeProvider>
   );

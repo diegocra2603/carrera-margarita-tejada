@@ -41,35 +41,35 @@ export default function ModalQR({ open, onClose, linkPago }: ModalQRProps) {
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.3 }}
           >
-            <DialogTitle sx={{ 
-              bgcolor: '#003B7A', 
-              color: 'white',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              py: 2,
-            }}>
-              <Typography variant="h6" fontWeight="bold">
-                Pago con Zigi
-              </Typography>
-              <IconButton
-                onClick={onClose}
-                sx={{ color: 'white' }}
-              >
-                ✕
-              </IconButton>
-            </DialogTitle>
+                               <DialogTitle sx={{
+                     bgcolor: '#003B7A',
+                     color: 'white',
+                     display: 'flex',
+                     justifyContent: 'space-between',
+                     alignItems: 'center',
+                     py: 2,
+                   }}>
+                     <Typography variant="body1" fontWeight="bold" sx={{ fontSize: '1.25rem' }}>
+                       Pago con Zigi
+                     </Typography>
+                     <IconButton
+                       onClick={onClose}
+                       sx={{ color: 'white' }}
+                     >
+                       ✕
+                     </IconButton>
+                   </DialogTitle>
 
-            <DialogContent sx={{ 
-              p: 3, 
+            <DialogContent sx={{
+              p: 3,
               textAlign: 'center',
               overflowY: 'auto',
               maxHeight: 'calc(90vh - 80px)'
             }}>
               <Box sx={{ mb: 2, mt: 2 }}>
-                <img 
-                  src="/zigi.png" 
-                  alt="Zigi" 
+                <img
+                  src="/zigi.png"
+                  alt="Zigi"
                   className="w-12 h-12 mx-auto mb-2"
                 />
                 <Typography variant="h6" fontWeight="bold" color="#003B7A" sx={{ mb: 1 }}>
@@ -81,9 +81,9 @@ export default function ModalQR({ open, onClose, linkPago }: ModalQRProps) {
               </Box>
 
               {/* Código QR */}
-              <Box sx={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
+              <Box sx={{
+                display: 'flex',
+                justifyContent: 'center',
                 mb: 2,
                 p: 1,
                 bgcolor: 'white',
@@ -104,9 +104,9 @@ export default function ModalQR({ open, onClose, linkPago }: ModalQRProps) {
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                   O copia este enlace:
                 </Typography>
-                <Box sx={{ 
-                  p: 1.5, 
-                  bgcolor: '#f5f5f5', 
+                <Box sx={{
+                  p: 1.5,
+                  bgcolor: '#f5f5f5',
                   borderRadius: 1,
                   wordBreak: 'break-all',
                   fontFamily: 'monospace',
