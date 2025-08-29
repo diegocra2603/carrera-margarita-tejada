@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MenuHeader from '../components/MenuHeader';
+import NavigationMenu from '../components/NavigationMenu';
+import FooterMenu from '../components/FooterMenu';
+import ConfirmacionExitosaComponent from '../components/ConfirmacionExitosa';
+---
+
+<Layout title="Pago Exitoso - Carrera Margarita Tejada">
+  <MenuHeader client:load />
+  <NavigationMenu client:load />
+  
+  <div class="pt-20 pb-10">
+    <div class="container mx-auto px-5">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+          ¡Pago Exitoso!
+        </h1>
+        <p class="text-lg text-gray-600">
+          Tu transacción ha sido procesada correctamente
+        </p>
+      </div>
+      
+      <ConfirmacionExitosaComponent client:load />
+    </div>
+  </div>
+  
+  <FooterMenu client:load />
+</Layout>

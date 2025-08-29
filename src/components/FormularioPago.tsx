@@ -196,11 +196,8 @@ export default function FormularioPago() {
 
       // Para tarjeta de crédito, procesar respuesta exitosa
       if (responseData.success) {
-        // Limpiar sesión
-        sessionStorage.removeItem('datosCompra');
-        
-        alert('¡Pago procesado exitosamente!');
-        window.location.href = '/';
+        // Redirigir a la página de confirmación exitosa
+        window.location.href = '/confirmacion-exitosa';
       } else {
         throw new Error(responseData.message || 'Error en el procesamiento del pago');
       }
