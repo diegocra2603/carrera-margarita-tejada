@@ -8,6 +8,7 @@ interface Participante {
   distancia: string;
   fechaNacimiento: string;
   ipu: string;
+  email: string;
 }
 
 interface DetallesCompraProps {
@@ -56,6 +57,7 @@ export default function DetallesCompra({ participantes, total }: DetallesCompraP
               {participante.ipu && (
                 <p><strong>IPU:</strong> {participante.ipu}</p>
               )}
+              <p><strong>Email:</strong> {participante.email}</p>
             </div>
           </motion.div>
         ))}

@@ -33,6 +33,7 @@ interface Participante {
   distancia: string;
   fechaNacimiento: string;
   ipu: string;
+  email: string;
 }
 
 interface DatosCompra {
@@ -138,6 +139,7 @@ export default function FormularioPago() {
           lastName: participante.apellido,
           distance: participante.distancia,
           birthDate: new Date(participante.fechaNacimiento).toISOString(),
+          email: participante.email,
           ipu: participante.ipu || ""
         })) || [],
         purchaseData: {

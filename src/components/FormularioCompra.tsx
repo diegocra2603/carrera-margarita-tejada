@@ -17,6 +17,7 @@ interface Participante {
   distancia: string;
   fechaNacimiento: string;
   ipu: string;
+  email: string;
 }
 
 export default function FormularioCompra() {
@@ -28,7 +29,8 @@ export default function FormularioCompra() {
       apellido: '',
       distancia: '',
       fechaNacimiento: '',
-      ipu: ''
+      ipu: '',
+      email: ''
     }
   ]);
   const [isValid, setIsValid] = useState<boolean>(false);
@@ -71,7 +73,8 @@ export default function FormularioCompra() {
       participante.nombre.trim() !== '' &&
       participante.apellido.trim() !== '' &&
       participante.distancia !== '' &&
-      participante.fechaNacimiento !== ''
+      participante.fechaNacimiento !== '' &&
+      participante.email.trim() !== ''
     );
   };
 
@@ -89,7 +92,8 @@ export default function FormularioCompra() {
         apellido: participanteExistente?.apellido || '',
         distancia: participanteExistente?.distancia || '',
         fechaNacimiento: participanteExistente?.fechaNacimiento || '',
-        ipu: participanteExistente?.ipu || ''
+        ipu: participanteExistente?.ipu || '',
+        email: participanteExistente?.email || ''
       });
     }
     
@@ -163,7 +167,8 @@ export default function FormularioCompra() {
       apellido: '',
       distancia: '',
       fechaNacimiento: '',
-      ipu: ''
+      ipu: '',
+      email: ''
     }]);
     setIsValid(false);
   };
@@ -282,6 +287,20 @@ export default function FormularioCompra() {
                         onChange={(e) => handleParticipanteChange(participante.id, 'apellido', e.target.value)}
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Ingresa tu apellido"
+                      />
+                    </div>
+
+              {/* Email */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Correo electrónico *
+                      </label>
+                      <input
+                        type="email"
+                        value={participante.email}
+                        onChange={(e) => handleParticipanteChange(participante.id, 'email', e.target.value)}
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Ingresa tu correo electrónico"
                       />
                     </div>
 
