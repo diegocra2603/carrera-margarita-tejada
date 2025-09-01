@@ -1,4 +1,5 @@
 import React from 'react';
+import MenuButton from './MenuButton';
 
 export default function MenuHeader() {
   return (
@@ -14,16 +15,12 @@ export default function MenuHeader() {
           </div>
           
           <div className="flex justify-end items-center gap-6">
-            <div className="sm:w-[100px] w-[60px]">
-              <a href="/compra" className="bg-yellow-500 text-blue-900 font-bold py-2 px-6 rounded-full text-sm hover:bg-transparent hover:text-yellow-500 hover:border hover:border-yellow-500 transition duration-300 ease-in-out">
-                COMPRAR
-              </a>
-            </div>
-            <div className="sm:w-[100px] w-[60px]">
-              <a href="#" className="bg-yellow-500 text-blue-900 font-bold py-2 px-6 rounded-full text-sm hover:bg-transparent hover:text-yellow-500 hover:border hover:border-yellow-500 transition duration-300 ease-in-out">
-                REGISTRARSE
-              </a>
-            </div>
+            <MenuButton href="/compra" variant="primary">
+              COMPRAR
+            </MenuButton>
+            <MenuButton href="#" variant="primary">
+              REGISTRARSE
+            </MenuButton>
           </div>
          
         </div>

@@ -1,0 +1,256 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import MenuHeader from '../../components/MenuHeader';
+import NavigationMenu from '../../components/NavigationMenu';
+import FooterMenu from '../../components/FooterMenu';
+import MenuButton from '../../components/MenuButton';
+
+const { id } = Astro.params;
+---
+
+<Layout title={`Ticket ${id} - Carrera Margarita Tejada`}>
+  <MenuHeader client:load />
+  <NavigationMenu client:load />
+  
+  <div class="container mx-auto sm:px-10 px-5">
+    <div class="pt-10">
+      <div class="text-2xl font-bold font-azul">
+        Información del Ticket
+      </div>
+      <div class="text-xl">
+        ID: <span class="font-mono bg-blue-100 px-3 py-1 rounded">{id}</span>
+      </div>
+    </div>
+    
+    <hr class="border-1 border-yellow-400 my-8">
+    
+    <div class="pb-10">
+      <div class="divide-gray-900/10 bg-gray-50 px-5">
+        <div class="grid grid-cols-1 gap-x-8 gap-y-8 p-5">
+          <div class="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
+            <!-- Contenido dinámico -->
+            <div id="ticketContent" class="p-6">
+        <!-- Loading -->
+        <div id="loading" class="text-center py-8">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <p class="mt-4 text-blue-700">Cargando información del ticket...</p>
+        </div>
+
+        <!-- Error -->
+        <div id="errorContainer" class="bg-red-50 border border-red-200 rounded-lg p-6 text-center hidden">
+          <div class="text-red-600 mb-4">
+            <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-red-800 mb-2">Ticket no encontrado</h3>
+          <p class="text-red-600">No se encontró un ticket con el ID <strong>{id}</strong>. Verifica que el código QR sea válido.</p>
+          <div class="mt-6">
+            <a href="/" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200">
+              Volver al inicio
+            </a>
+          </div>
+        </div>
+
+        <!-- Información del ticket -->
+        <div id="ticketInfo" class="bg-white rounded-lg shadow-lg p-6 hidden">
+          <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold text-blue-900 mb-2">Información del Ticket</h2>
+            <div class="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">
+              ID: <span id="ticketIdDisplay"></span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Información básica -->
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">Código</label>
+                <p id="codigo" class="text-lg font-semibold text-gray-900"></p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">Estado</label>
+                <span id="estado" class="inline-block px-3 py-1 rounded-full text-sm font-medium"></span>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">Plataforma</label>
+                <p id="plataforma" class="text-lg text-gray-900"></p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">Distancia</label>
+                <p id="distancia" class="text-lg text-gray-900"></p>
+              </div>
+            </div>
+
+            <!-- Información personal -->
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">Nombre</label>
+                <p id="nombre" class="text-lg text-gray-900"></p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">Apellido</label>
+                <p id="apellido" class="text-lg text-gray-900"></p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">Fecha de Nacimiento</label>
+                <p id="fechaNacimiento" class="text-lg text-gray-900"></p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">IPU</label>
+                <p id="ipu" class="text-lg text-gray-900"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de compra -->
+          <div class="mt-8 pt-6 border-t border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">Cantidad</label>
+                <p id="cantidad" class="text-2xl font-bold text-blue-600"></p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">Total</label>
+                <p id="total" class="text-2xl font-bold text-green-600"></p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">Fecha de Creación</label>
+                <p id="fechaCreacion" class="text-lg text-gray-900"></p>
+              </div>
+            </div>
+          </div>
+
+                          <!-- Botón para volver -->
+                <div class="mt-8 text-center">
+                  <MenuButton href="/" variant="secondary" width="auto" client:load>
+                    Volver al inicio
+                  </MenuButton>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <FooterMenu client:load />
+  </div>
+
+  <script define:vars={{ ticketId: id }}>
+    // Esperar a que el DOM esté completamente cargado
+    window.addEventListener('load', function() {
+      console.log('DOM cargado, iniciando búsqueda del ticket:', ticketId);
+      
+      const loading = document.getElementById('loading');
+      const errorContainer = document.getElementById('errorContainer');
+      const ticketInfo = document.getElementById('ticketInfo');
+
+      if (!loading || !errorContainer || !ticketInfo) {
+        console.error('No se pudieron encontrar los elementos del DOM');
+        return;
+      }
+
+      // Cargar información del ticket automáticamente
+      loadTicketInfo();
+
+      async function loadTicketInfo() {
+        try {
+          console.log('Buscando ticket con ID:', ticketId);
+          const response = await fetch(`http://localhost:7227/api/v1/productcarrera/${ticketId}`);
+          
+          console.log('Respuesta de la API:', response);
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const ticket = await response.json();
+          console.log('Datos del ticket recibidos:', ticket);
+          
+          // Ocultar loading y mostrar información
+          loading.classList.add('hidden');
+          ticketInfo.classList.remove('hidden');
+          
+          // Llenar la información del ticket usando los nombres exactos del DTO
+          const ticketIdDisplay = document.getElementById('ticketIdDisplay');
+          const codigo = document.getElementById('codigo');
+          const estadoElement = document.getElementById('estado');
+          const plataforma = document.getElementById('plataforma');
+          const distancia = document.getElementById('distancia');
+          const nombre = document.getElementById('nombre');
+          const apellido = document.getElementById('apellido');
+          const fechaNacimiento = document.getElementById('fechaNacimiento');
+          const ipu = document.getElementById('ipu');
+          const cantidad = document.getElementById('cantidad');
+          const total = document.getElementById('total');
+          const fechaCreacion = document.getElementById('fechaCreacion');
+
+                     // Usar los nombres exactos de la API (en minúsculas)
+           if (ticketIdDisplay) ticketIdDisplay.textContent = ticket.id || ticketId;
+           if (codigo) codigo.textContent = ticket.codigo || 'N/A';
+           
+           // Estado con colores - convertir número a texto
+           if (estadoElement) {
+             const estadoTexto = getEstadoTexto(ticket.estado);
+             estadoElement.textContent = estadoTexto;
+             estadoElement.className = 'inline-block px-3 py-1 rounded-full text-sm font-medium ' + getEstadoClass(estadoTexto);
+           }
+           
+           // Plataforma - convertir número a texto
+           if (plataforma) plataforma.textContent = getPlatformTexto(ticket.platform) || 'N/A';
+           if (distancia) distancia.textContent = ticket.distance || 'N/A';
+           if (nombre) nombre.textContent = ticket.firstName || 'N/A';
+           if (apellido) apellido.textContent = ticket.lastName || 'N/A';
+           if (fechaNacimiento) fechaNacimiento.textContent = ticket.birthDate ? new Date(ticket.birthDate).toLocaleDateString('es-ES') : 'N/A';
+           if (ipu) ipu.textContent = ticket.ipu || 'N/A';
+           if (cantidad) cantidad.textContent = ticket.quantity || 'N/A';
+           if (total) total.textContent = ticket.total ? `Q${ticket.total.toFixed(2)}` : 'N/A';
+           if (fechaCreacion) fechaCreacion.textContent = ticket.createdAt ? new Date(ticket.createdAt).toLocaleDateString('es-ES') : 'N/A';
+
+        } catch (error) {
+          console.error('Error al cargar el ticket:', error);
+          loading.classList.add('hidden');
+          errorContainer.classList.remove('hidden');
+        }
+      }
+
+             // Función para convertir número de estado a texto según el enum ProductCarreraEstado
+       function getEstadoTexto(estadoNumero) {
+         switch (estadoNumero) {
+           case 1: return 'Activo';
+           case 2: return 'Inactivo';
+           case 3: return 'Vendido';
+           case 4: return 'Pendiente de Pago';
+           default: return 'Desconocido';
+         }
+       }
+
+       // Función para convertir número de plataforma a texto según el enum ProductCarreraPlatform
+       function getPlatformTexto(platformNumero) {
+         switch (platformNumero) {
+           case 1: return 'Físico';
+           case 2: return 'Digital';
+           default: return 'Desconocida';
+         }
+       }
+
+       function getEstadoClass(estado) {
+         if (!estado) return 'bg-gray-100 text-gray-800';
+         
+         switch (estado.toLowerCase()) {
+           case 'activo':
+             return 'bg-green-100 text-green-800';
+           case 'inactivo':
+             return 'bg-gray-100 text-gray-800';
+           case 'vendido':
+             return 'bg-blue-100 text-blue-800';
+           case 'pendiente de pago':
+             return 'bg-yellow-100 text-yellow-800';
+           default:
+             return 'bg-gray-100 text-gray-800';
+         }
+       }
+    });
+  </script>
+</Layout>
