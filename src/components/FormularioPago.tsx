@@ -163,7 +163,7 @@ export default function FormularioPago() {
 
       // Enviar datos a la API
       console.log('\n=== ENVIANDO A LA API ===');
-      const response = await fetch('http://localhost:7227/api/v1/productcarrera/register-payment', {
+      const response = await fetch('https://app-delivery-api-dev-eastus2.azurewebsites.net/api/v1/productcarrera/register-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
