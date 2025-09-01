@@ -43,6 +43,14 @@ interface DatosCompra {
 }
 
 export default function FormularioPago() {
+  // Función helper para construir URLs de la API
+  const buildApiUrl = (endpoint: string): string => {
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://app-delivery-api-dev-eastus2.azurewebsites.net';
+    const baseUrl = apiBaseUrl.replace(/\/$/, ''); // Remover trailing slash
+    const cleanEndpoint = endpoint.replace(/^\//, ''); // Remover leading slash
+    return `${baseUrl}/${cleanEndpoint}`;
+  };
+
   const [datosCompra, setDatosCompra] = useState<DatosCompra | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -161,9 +169,10 @@ export default function FormularioPago() {
    
       console.log("datosEnviar", datosEnviar);
 
-      // Enviar datos a la API
+      // Enviar datos a la API a través del endpoint local
       console.log('\n=== ENVIANDO A LA API ===');
-      const response = await fetch('https://app-delivery-api-dev-eastus2.azurewebsites.net/api/v1/productcarrera/register-payment', {
+      
+      const response = await fetch('/api/payment/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
