@@ -13,7 +13,7 @@ export default function BannerInicio() {
               animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              <img className="w-full" src="/logo-carrera.svg" alt="Logo Carrera" />
+              <img className="w-full" src="/banner/logo-carrera.png" alt="Logo Carrera" />
             </motion.div>
           </div>
           <div>
@@ -26,7 +26,7 @@ export default function BannerInicio() {
               {/* Imagen principal */}
               <img 
                 className="w-full transform transition-transform duration-700 hover:scale-105" 
-                src="/ninos-banner.png" 
+                src="/banner/corredores.png" 
                 alt="Niños" 
               />
             </motion.div>
